@@ -48,7 +48,6 @@ public class PaymentGatewayFastpayServiceImpl implements PaymentGatewayService {
         var builder = FastpayPaymentInput.builder()
                 .referenceCode(request.getInvoiceId().toString())
                 .totalAmount(request.getAmount())
-                .creditCardId(request.getCreditCardId().toString())
                 .fullName(payer.getFullName())
                 .document(payer.getDocument())
                 .phone(payer.getPhone())

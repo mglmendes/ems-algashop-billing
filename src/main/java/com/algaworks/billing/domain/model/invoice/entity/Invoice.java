@@ -33,7 +33,7 @@ public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
     private OffsetDateTime issuedAt;
     private OffsetDateTime paidAt;
     private OffsetDateTime canceledAt;
-    private OffsetDateTime expiredAt;
+    private OffsetDateTime expiresAt;
 
     private BigDecimal totalAmount;
     @Enumerated(EnumType.STRING)
