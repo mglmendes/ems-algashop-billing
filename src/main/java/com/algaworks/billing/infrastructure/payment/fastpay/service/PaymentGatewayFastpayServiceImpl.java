@@ -7,20 +7,16 @@ import com.algaworks.billing.domain.model.invoice.entity.Payer;
 import com.algaworks.billing.domain.model.invoice.payment.entity.Payment;
 import com.algaworks.billing.domain.model.invoice.payment.request.PaymentRequest;
 import com.algaworks.billing.domain.model.invoice.payment.service.PaymentGatewayService;
-import com.algaworks.billing.infrastructure.payment.fastpay.client.FastpayPaymentAPIClient;
+import com.algaworks.billing.infrastructure.payment.fastpay.client.ResilientPaymentGatewayFastpayClient;
 import com.algaworks.billing.infrastructure.payment.fastpay.enums.FastpayPaymentMethod;
 import com.algaworks.billing.infrastructure.payment.fastpay.enums.FastpayPaymentStatus;
 import com.algaworks.billing.infrastructure.payment.fastpay.input.FastpayPaymentInput;
 import com.algaworks.billing.infrastructure.payment.fastpay.model.FastpayPaymentModel;
 import com.algaworks.billing.infrastructure.payment.fastpay.util.FastpayEnumConverter;
 import com.algaworks.billing.infrastructure.payment.properties.AlgaShopPaymentProperties;
-import com.algaworks.billing.presentention.exception.BadGatewayException;
-import com.algaworks.billing.presentention.exception.GatewayTimeoutException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.UUID;
 
@@ -29,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentGatewayFastpayServiceImpl implements PaymentGatewayService {
 
-    private final FastpayPaymentAPIClient fastpayPaymentAPIClient;
+    private final ResilientPaymentGatewayFastpayClient resilientClient;
     private final CreditCardRepository creditCardRepository;
     private final AlgaShopPaymentProperties algaShopPaymentProperties;
 
@@ -37,29 +33,12 @@ public class PaymentGatewayFastpayServiceImpl implements PaymentGatewayService {
     @Override
     public Payment capture(PaymentRequest request) {
         FastpayPaymentInput input = convertToInput(request);
-        FastpayPaymentModel response;
-        try {
-            response = fastpayPaymentAPIClient.capture(input);
-        } catch (ResourceAccessException e) {
-            throw new GatewayTimeoutException("Fastpay API Timeout", e);
-        } catch (HttpClientErrorException e) {
-            throw new BadGatewayException("Fastpay API Bad Gateway", e);
-        }
-        return convertToPayment(response);
+        return convertToPayment(resilientClient.capture(input));
     }
 
     @Override
     public Payment findByCode(String gatewayCode) {
-        FastpayPaymentModel response;
-        try {
-            response = fastpayPaymentAPIClient.findById(gatewayCode);
-        } catch (ResourceAccessException e) {
-            throw new GatewayTimeoutException("Fastpay API Timeout", e);
-        } catch (HttpClientErrorException e) {
-            throw new BadGatewayException("Fastpay API Bad Gateway", e);
-        }
-
-        return convertToPayment(response);
+        return convertToPayment(resilientClient.findById(gatewayCode));
     }
 
     private FastpayPaymentInput convertToInput(PaymentRequest request) {
