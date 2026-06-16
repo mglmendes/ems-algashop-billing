@@ -13,3 +13,25 @@ algashop:
   integrations:
     payment:
       provider: FASTPAY
+
+
+management:
+  info:
+    env.enabled: true
+  health:
+    redis:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+      group:
+        readiness:
+          include: mongo,readinessState
+      status:
+        order: "DOWN, OUT_OF_SERVICE, UNKNOWN, DEGRADED, UP"
+info:
+  app.name: AlgaShop Billing API
