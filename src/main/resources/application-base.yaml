@@ -30,7 +30,7 @@ management:
       show-details: always
       group:
         readiness:
-          include: mongo,readinessState
+          include: readinessState
       status:
         order: "DOWN, OUT_OF_SERVICE, UNKNOWN, DEGRADED, UP"
 info:
