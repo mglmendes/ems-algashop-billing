@@ -4,6 +4,8 @@ import com.algaworks.billing.application.creditcard.query.CreditCardQueryService
 import com.algaworks.billing.application.creditcard.query.input.TokenizedCreditCardInput;
 import com.algaworks.billing.application.creditcard.query.output.CreditCardOutput;
 import com.algaworks.billing.application.creditcard.service.CreditCardManagementService;
+import com.algaworks.billing.infrastructure.security.SecurityAnnotations.CanWriteCreditCards;
+import com.algaworks.billing.infrastructure.security.SecurityAnnotations.CanReadCreditCards;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,7 @@ public class CreditCardController {
     private final CreditCardManagementService creditCardManagementService;
     private final CreditCardQueryService creditCardQueryService;
 
+    @CanWriteCreditCards
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreditCardOutput register(@PathVariable UUID customerId, @RequestBody @Valid TokenizedCreditCardInput input) {
@@ -28,16 +31,19 @@ public class CreditCardController {
         return creditCardQueryService.findOne(customerId, creditCardId);
     }
 
+    @CanReadCreditCards
     @GetMapping
     public List<CreditCardOutput> findAllByCustomerId(@PathVariable UUID customerId) {
         return creditCardQueryService.findByCustomer(customerId);
     }
 
+    @CanReadCreditCards
     @GetMapping("/{creditCardId}")
     public CreditCardOutput findByCreditCardId(@PathVariable UUID customerId, @PathVariable UUID creditCardId) {
         return creditCardQueryService.findOne(customerId, creditCardId);
     }
 
+    @CanWriteCreditCards
     @DeleteMapping("/{creditCardId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID customerId, @PathVariable UUID creditCardId) {

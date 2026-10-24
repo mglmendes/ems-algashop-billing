@@ -4,6 +4,8 @@ import com.algaworks.billing.application.invoice.input.GenerateInvoiceInput;
 import com.algaworks.billing.application.invoice.output.InvoiceOutput;
 import com.algaworks.billing.application.invoice.query.InvoiceQueryService;
 import com.algaworks.billing.application.invoice.service.InvoiceManagementApplicationService;
+import com.algaworks.billing.infrastructure.security.SecurityAnnotations.CanWriteInvoices;
+import com.algaworks.billing.infrastructure.security.SecurityAnnotations.CanReadInvoices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ public class InvoiceController {
     private final InvoiceQueryService  invoiceQueryService;
     private final InvoiceManagementApplicationService invoiceManagementApplicationService;
 
+    @CanWriteInvoices
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public InvoiceOutput generate(@PathVariable String orderId, @RequestBody @Valid GenerateInvoiceInput input) {
@@ -34,6 +37,7 @@ public class InvoiceController {
         return invoiceQueryService.findByOrderId(orderId);
     }
 
+    @CanReadInvoices
     @GetMapping
     public InvoiceOutput findOne(@PathVariable String orderId) {
         return invoiceQueryService.findByOrderId(orderId);
