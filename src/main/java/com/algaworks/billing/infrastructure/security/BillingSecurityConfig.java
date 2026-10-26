@@ -23,7 +23,7 @@ public class BillingSecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("api/v1/webhooks/**").permitAll()
+                        .requestMatchers("/api/v1/webhooks/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(Customizer.withDefaults()));
